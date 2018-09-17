@@ -21,7 +21,7 @@ public class StoryDBHelper extends SQLiteOpenHelper {
         // create the Locations Table
         final String CREATE_LOCATIONS_TABLE =
                 "CREATE TABLE " + StoryDBDescription.Locations.TABLE_NAME + "(" +
-                        StoryDBDescription.Locations._ID + " INTEGER primary key, " + // not autoincrement
+                        StoryDBDescription.Locations._ID + " INTEGER primary key, " + // not autoincremented
                         StoryDBDescription.Locations.COLUMN_NAME + " TEXT, " +
                         StoryDBDescription.Locations.COLUMN_TEASER + " TEXT, " +
                         StoryDBDescription.Locations.COLUMN_SUMMARY + " TEXT, " +
@@ -51,7 +51,7 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME + "(" +
                         StoryDBDescription.GlobalAchievementsToBeAwarded._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.GlobalAchievementsToBeAwarded.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.GlobalAchievementsToBeAwarded.COLUMN_GLOBAL_ACHIEVEMENT_ID + " TEXT, " +
+                        StoryDBDescription.GlobalAchievementsToBeAwarded.COLUMN_GLOBAL_ACHIEVEMENT_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.GlobalAchievementsToBeAwarded.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.GlobalAchievementsToBeAwarded.COLUMN_GLOBAL_ACHIEVEMENT_ID + "));";
         db.execSQL(CREATE_GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED_TABLE);
@@ -61,7 +61,7 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME + "(" +
                         StoryDBDescription.GlobalAchievementsToBeRevoked._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.GlobalAchievementsToBeRevoked.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.GlobalAchievementsToBeRevoked.COLUMN_GLOBAL_ACHIEVEMENT_ID + " TEXT, " +
+                        StoryDBDescription.GlobalAchievementsToBeRevoked.COLUMN_GLOBAL_ACHIEVEMENT_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.GlobalAchievementsToBeRevoked.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.GlobalAchievementsToBeRevoked.COLUMN_GLOBAL_ACHIEVEMENT_ID + "));";
         db.execSQL(CREATE_GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED_TABLE);
@@ -71,7 +71,7 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME + "(" +
                         StoryDBDescription.PartyAchievementsToBeAwarded._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.PartyAchievementsToBeAwarded.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.PartyAchievementsToBeAwarded.COLUMN_PARTY_ACHIEVEMENT_ID + " TEXT, " +
+                        StoryDBDescription.PartyAchievementsToBeAwarded.COLUMN_PARTY_ACHIEVEMENT_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.PartyAchievementsToBeAwarded.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.PartyAchievementsToBeAwarded.COLUMN_PARTY_ACHIEVEMENT_ID + "));";
         db.execSQL(CREATE_PARTY_ACHIEVEMENTS_TO_BE_AWARDED_TABLE);
@@ -81,7 +81,7 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME + "(" +
                         StoryDBDescription.PartyAchievementsToBeRevoked._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.PartyAchievementsToBeRevoked.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.PartyAchievementsToBeRevoked.COLUMN_PARTY_ACHIEVEMENT_ID + " TEXT, " +
+                        StoryDBDescription.PartyAchievementsToBeRevoked.COLUMN_PARTY_ACHIEVEMENT_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.PartyAchievementsToBeRevoked.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.PartyAchievementsToBeRevoked.COLUMN_PARTY_ACHIEVEMENT_ID + "));";
         db.execSQL(CREATE_PARTY_ACHIEVEMENTS_TO_BE_REVOKED_TABLE);
@@ -127,9 +127,9 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.AddRewards.TABLE_NAME + "(" +
                         StoryDBDescription.AddRewards._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.AddRewards.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.AddRewards.COLUMN_REWARD_TYPE_ID + " TEXT, " +
+                        StoryDBDescription.AddRewards.COLUMN_REWARD_TYPE_ID + " INTEGER, " +
                         StoryDBDescription.AddRewards.COLUMN_REWARD_VALUE + " INTEGER, " +
-                        StoryDBDescription.AddRewards.COLUMN_REWARD_APPLICATION_TYPE_ID + " TEXT, " +
+                        StoryDBDescription.AddRewards.COLUMN_REWARD_APPLICATION_TYPE_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.AddRewards.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.AddRewards.COLUMN_REWARD_TYPE_ID + "));";
         db.execSQL(CREATE_ADD_REWARDS_TABLE);
@@ -139,9 +139,9 @@ public class StoryDBHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + StoryDBDescription.AddPenalties.TABLE_NAME + "(" +
                         StoryDBDescription.AddPenalties._ID + " INTEGER primary key AUTOINCREMENT, " +
                         StoryDBDescription.AddPenalties.COLUMN_LOCATION_TO_BE_COMPLETED_ID + " INTEGER, " +
-                        StoryDBDescription.AddPenalties.COLUMN_PENALTY_TYPE_ID + " TEXT, " +
+                        StoryDBDescription.AddPenalties.COLUMN_PENALTY_TYPE_ID + " INTEGER, " +
                         StoryDBDescription.AddPenalties.COLUMN_PENALTY_VALUE + " INTEGER, " +
-                        StoryDBDescription.AddPenalties.COLUMN_PENALTY_APPLICATION_TYPE_ID + " TEXT, " +
+                        StoryDBDescription.AddPenalties.COLUMN_PENALTY_APPLICATION_TYPE_ID + " INTEGER, " +
                         "UNIQUE (" + StoryDBDescription.AddPenalties.COLUMN_LOCATION_TO_BE_COMPLETED_ID +
                         ", " + StoryDBDescription.AddPenalties.COLUMN_PENALTY_TYPE_ID + "));";
         db.execSQL(CREATE_ADD_PENALTIES_TABLE);

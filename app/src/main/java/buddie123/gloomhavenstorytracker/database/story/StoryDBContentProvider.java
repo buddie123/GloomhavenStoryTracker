@@ -21,6 +21,9 @@ public class StoryDBContentProvider extends ContentProvider{
             new UriMatcher(UriMatcher.NO_MATCH);
 
     // constants used with UriMatcher to determine operation to perform
+    // IMPORTANT: For each table, the single row access constant should be odd
+    // and one less than the table access constant. The logic in the CRUD
+    // operations depend on this arraignment.
     private static final int ONE_CHARACTER_CLASS = 1;
     private static final int CHARACTER_CLASSES = 2;
 
@@ -62,114 +65,103 @@ public class StoryDBContentProvider extends ContentProvider{
 
     private static final int ONE_ADD_PENALTY = 27;
     private static final int ADD_PENALTIES = 28;
+    // IMPORTANT: For each table added to this database, the single row
+    // access constant should be odd and one less than the table access
+    // constant. The logic in the CRUD operations depend on this arraignment.
 
 
     // static block to configure this ContentProvider's UriMatcher
+    // The StoryDBDescription.XXXXXXX.TABLE_NAME + "/#" appends a numerical
+    // wildcard to the end of the Uri. This is so that Uri's of this form
+    // can have the row _ID appended to the end and be easily parsed.
     static {
 
         //Locations
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.Locations.TABLE_NAME + "/#", ONE_LOCATION);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.Locations.TABLE_NAME, LOCATIONS);
 
         // Global Achievements
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievements.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievements.TABLE_NAME, GLOBAL_ACHIEVEMENTS);
 
         // Party Achievements
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievements.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievements.TABLE_NAME, PARTY_ACHIEVEMENTS);
 
         // Global Achievements to be awarded
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_AWARDED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED);
 
         // Global Achievements to be revoked
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_REVOKED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED);
 
         // Party Achievements to be awarded
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_AWARDED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_AWARDED);
 
         //Party Achievements to be revoked
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_REVOKED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_REVOKED);
 
         // Locations to be unlocked
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.LocationsToBeUnlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_UNLOCKED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.LocationsToBeUnlocked.TABLE_NAME, LOCATIONS_TO_BE_UNLOCKED);
 
         // Locations to be blocked
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.LocationsToBeBlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_BLOCKED);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.LocationsToBeBlocked.TABLE_NAME, LOCATIONS_TO_BE_BLOCKED);
 
         // Add Reward Application Types
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_APPLICATION_TYPE);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME, ADD_REWARD_APPLICATION_TYPES);
 
         // Add Reward Types
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewardTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_TYPE);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewardTypes.TABLE_NAME, ADD_REWARD_TYPES);
 
         // Add Rewards
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewards.TABLE_NAME + "/#", ONE_ADD_REWARD);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddRewards.TABLE_NAME, ADD_REWARDS);
 
         // Add Penalties
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddPenalties.TABLE_NAME + "/#", ONE_ADD_PENALTY);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.AddPenalties.TABLE_NAME, ADD_PENALTIES);
 
         // Character Classes
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.CharacterClasses.TABLE_NAME + "/#", ONE_CHARACTER_CLASS);
-
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.CharacterClasses.TABLE_NAME, CHARACTER_CLASSES);
     }
 
-
-
-
-
+    // simply initializes the StoryDBHelper
     @Override
     public boolean onCreate() {
         dbHelper = new StoryDBHelper(getContext());
@@ -177,6 +169,7 @@ public class StoryDBContentProvider extends ContentProvider{
         // TODO verify that this return value is correct
     }
 
+    // not sure what this method is suppose to do
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
@@ -184,6 +177,10 @@ public class StoryDBContentProvider extends ContentProvider{
         // TODO Research how this method should be implemented
     }
 
+    // query's the database and returns the Cursor
+    // This method depends on the constants defined above having a certain
+    // structure. In particular, single row grabs should be odd, and
+    // multi-row grabs should be even.
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
@@ -203,6 +200,8 @@ public class StoryDBContentProvider extends ContentProvider{
                 projection, selection, selectionArgs, null, null, sortOrder);
     }
 
+    // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
+    // insert the given elements into the given table ( should not give a row id, except for location)
     @Nullable
     @Override   // TODO this method should throw an exception and not perform the insert
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
@@ -267,8 +266,11 @@ public class StoryDBContentProvider extends ContentProvider{
         return newElementUri;
     }
 
+    // delete the row in the given table with the given ID
+    // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
     @Override // TODO this method should throw exception and not delete anything from the database
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        // get the _ID field of the row to delete
         String id = uri.getLastPathSegment();
 
         // delete the rows in the appropriate table, if able
@@ -286,11 +288,13 @@ public class StoryDBContentProvider extends ContentProvider{
         return numberOfRowsDeleted;
     }
 
+    // update the row in the given table with the given ID
+    // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
     @Override // TODO this method should throw exception and not update the database
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
         String id = uri.getLastPathSegment();
 
-        // delete the rows in the appropriate table, if able
+        // update the rows in the appropriate table, if able
         int numberOfRowsUpdated = dbHelper.getWritableDatabase().update(
                 getTableName(uri), contentValues, BaseColumns._ID + "=" + id, selectionArgs);
 
@@ -301,11 +305,14 @@ public class StoryDBContentProvider extends ContentProvider{
             }
         }
 
-        // return how many rows were deleted
+        // return how many rows were updated
         return numberOfRowsUpdated;
     }
 
     // return a table name based on a given Uri, or throw an error if invalid
+    // note: the switch logic expects that whole table lookups will be even and that
+    // single row lookups will odd and use a constant one number less than the whole
+    // table lookup constant
     private String getTableName(Uri uri) {
         String tableName;
         switch (uriMatcher.match(uri) % 2 == 0 ? uriMatcher.match(uri) : uriMatcher.match(uri) + 1) {

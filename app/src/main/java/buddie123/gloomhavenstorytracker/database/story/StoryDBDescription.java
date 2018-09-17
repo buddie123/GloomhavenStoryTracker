@@ -13,7 +13,8 @@ public class StoryDBDescription {
     private static final Uri BASE_CONTENT_URI =
             Uri.parse("content://" + AUTHORITY);
 
-    // characterClasses
+    // the character class keeps track of each of the 17 playable character
+    // classes available in the game
     public static final class CharacterClasses implements BaseColumns {
         public static final String TABLE_NAME = "character_classes";
 
