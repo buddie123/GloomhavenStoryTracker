@@ -5,15 +5,14 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import buddie123.gloomhavenstorytracker.database.DatabaseDescription;
-
-public class StoryDBContentProvider extends ContentProvider {
+public class StoryDBContentProvider extends ContentProvider{
     // used to access the database
     private StoryDBHelper dbHelper;
 
@@ -69,102 +68,102 @@ public class StoryDBContentProvider extends ContentProvider {
     static {
 
         //Locations
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.Locations.TABLE_NAME + "/#", ONE_LOCATION);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.Locations.TABLE_NAME + "/#", ONE_LOCATION);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.Locations.TABLE_NAME, LOCATIONS);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.Locations.TABLE_NAME, LOCATIONS);
 
         // Global Achievements
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievements.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievements.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievements.TABLE_NAME, GLOBAL_ACHIEVEMENTS);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievements.TABLE_NAME, GLOBAL_ACHIEVEMENTS);
 
         // Party Achievements
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievements.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievements.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievements.TABLE_NAME, PARTY_ACHIEVEMENTS);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievements.TABLE_NAME, PARTY_ACHIEVEMENTS);
 
         // Global Achievements to be awarded
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_AWARDED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_AWARDED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievementsToBeAwarded.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED);
 
         // Global Achievements to be revoked
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_REVOKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_REVOKED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.GlobalAchievementsToBeRevoked.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED);
 
         // Party Achievements to be awarded
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_AWARDED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_AWARDED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievementsToBeAwarded.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_AWARDED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_AWARDED);
 
         //Party Achievements to be revoked
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_REVOKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_PARTY_ACHIEVEMENT_TO_BE_REVOKED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.PartyAchievementsToBeRevoked.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_REVOKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME, PARTY_ACHIEVEMENTS_TO_BE_REVOKED);
 
         // Locations to be unlocked
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.LocationsToBeUnlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_UNLOCKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.LocationsToBeUnlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_UNLOCKED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.LocationsToBeUnlocked.TABLE_NAME, LOCATIONS_TO_BE_UNLOCKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.LocationsToBeUnlocked.TABLE_NAME, LOCATIONS_TO_BE_UNLOCKED);
 
         // Locations to be blocked
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.LocationsToBeBlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_BLOCKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.LocationsToBeBlocked.TABLE_NAME + "/#", ONE_LOCATIONS_TO_BE_BLOCKED);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.LocationsToBeBlocked.TABLE_NAME, LOCATIONS_TO_BE_BLOCKED);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.LocationsToBeBlocked.TABLE_NAME, LOCATIONS_TO_BE_BLOCKED);
 
         // Add Reward Application Types
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewardApplicationTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_APPLICATION_TYPE);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_APPLICATION_TYPE);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewardApplicationTypes.TABLE_NAME, ADD_REWARD_APPLICATION_TYPES);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME, ADD_REWARD_APPLICATION_TYPES);
 
         // Add Reward Types
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewardTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_TYPE);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewardTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_TYPE);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewardTypes.TABLE_NAME, ADD_REWARD_TYPES);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewardTypes.TABLE_NAME, ADD_REWARD_TYPES);
 
         // Add Rewards
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewards.TABLE_NAME + "/#", ONE_ADD_REWARD);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewards.TABLE_NAME + "/#", ONE_ADD_REWARD);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddRewards.TABLE_NAME, ADD_REWARDS);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddRewards.TABLE_NAME, ADD_REWARDS);
 
         // Add Penalties
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddPenalties.TABLE_NAME + "/#", ONE_ADD_PENALTY);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddPenalties.TABLE_NAME + "/#", ONE_ADD_PENALTY);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.AddPenalties.TABLE_NAME, ADD_PENALTIES);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.AddPenalties.TABLE_NAME, ADD_PENALTIES);
 
         // Character Classes
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.CharacterClasses.TABLE_NAME + "/#", ONE_CHARACTER_CLASS);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.CharacterClasses.TABLE_NAME + "/#", ONE_CHARACTER_CLASS);
 
-        uriMatcher.addURI(DatabaseDescription.AUTHORITY,
-                DatabaseDescription.CharacterClasses.TABLE_NAME, CHARACTER_CLASSES);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.CharacterClasses.TABLE_NAME, CHARACTER_CLASSES);
     }
 
 
@@ -205,17 +204,54 @@ public class StoryDBContentProvider extends ContentProvider {
     }
 
     @Nullable
-    @Override
+    @Override   // TODO this method should throw an exception and not perform the insert
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+        // insert into database. ignore insert if the constraints aren't met
+        long rowID = dbHelper.getWritableDatabase().insertWithOnConflict(
+                getTableName(uri), null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+
+        // get the uri for inserted element
+        if(rowID > 0) {
+            switch (uriMatcher.match(uri)) {
+                case LOCATIONS:
+                    return StoryDBDescription.Locations.buildLocationUri(rowID);
+                case GLOBAL_ACHIEVEMENTS:
+                    return StoryDBDescription.GlobalAchievements.buildGlobalAchievementUri(rowID);
+                case PARTY_ACHIEVEMENTS:
+                    return StoryDBDescription.PartyAchievements.buildPartyAchievementUri(rowID);
+                case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
+                    return StoryDBDescription.GlobalAchievementsToBeAwarded.buildGlobalAchievementToBeAwardedUri(rowID);
+                case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
+                    return StoryDBDescription.GlobalAchievementsToBeRevoked.buildGlobalAchievementToBeRevokedUri(rowID);
+                case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
+                    return StoryDBDescription.PartyAchievementsToBeAwarded.buildPartyAchievementToBeAwardedUri(rowID);
+                case PARTY_ACHIEVEMENTS_TO_BE_REVOKED:
+                    return StoryDBDescription.PartyAchievementsToBeRevoked.buildPartyAchievementToBeRevokedUri(rowID);
+                case LOCATIONS_TO_BE_UNLOCKED:
+                    return StoryDBDescription.LocationsToBeUnlocked.buildLocationToBeUnlockedUri(rowID);
+                case LOCATIONS_TO_BE_BLOCKED:
+                    return StoryDBDescription.LocationsToBeBlocked.buildLocationToBeBlockedUri(rowID);
+                case ADD_REWARD_APPLICATION_TYPES:
+                    return StoryDBDescription.AddRewardApplicationTypes.buildAddRewardApplicationTypeUri(rowID);
+                case ADD_REWARD_TYPES:
+                    return StoryDBDescription.AddRewardTypes.buildAddRewardTypeUri(rowID);
+                case ADD_REWARDS:
+                    return StoryDBDescription.AddRewards.buildAddRewardUri(rowID);
+                case ADD_PENALTIES:
+                    return StoryDBDescription.AddPenalties.buildAddPenaltyUri(rowID);
+                case CHARACTER_CLASSES:
+                    return StoryDBDescription.CharacterClasses.buildCharacterClassUri(rowID);
+            }
+        }
         return null;
     }
 
-    @Override
+    @Override // TODO this method should throw exception and not delete anything from the database
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
         return 0;
     }
 
-    @Override
+    @Override // TODO this method should throw exception and not update the database
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return 0;
     }
@@ -225,46 +261,46 @@ public class StoryDBContentProvider extends ContentProvider {
         String tableName;
         switch (uriMatcher.match(uri) % 2 == 0 ? uriMatcher.match(uri) : uriMatcher.match(uri) + 1) {
             case CHARACTER_CLASSES:
-                tableName = DatabaseDescription.CharacterClasses.TABLE_NAME;
+                tableName = StoryDBDescription.CharacterClasses.TABLE_NAME;
                 break;
             case LOCATIONS:
-                tableName = DatabaseDescription.Locations.TABLE_NAME;
+                tableName = StoryDBDescription.Locations.TABLE_NAME;
                 break;
             case GLOBAL_ACHIEVEMENTS:
-                tableName = DatabaseDescription.GlobalAchievements.TABLE_NAME;
+                tableName = StoryDBDescription.GlobalAchievements.TABLE_NAME;
                 break;
             case PARTY_ACHIEVEMENTS:
-                tableName = DatabaseDescription.PartyAchievements.TABLE_NAME;
+                tableName = StoryDBDescription.PartyAchievements.TABLE_NAME;
                 break;
             case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
-                tableName = DatabaseDescription.GlobalAchievementsToBeAwarded.TABLE_NAME;
+                tableName = StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME;
                 break;
             case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
-                tableName = DatabaseDescription.GlobalAchievementsToBeRevoked.TABLE_NAME;
+                tableName = StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME;
                 break;
             case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
-                tableName = DatabaseDescription.PartyAchievementsToBeAwarded.TABLE_NAME;
+                tableName = StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME;
                 break;
             case PARTY_ACHIEVEMENTS_TO_BE_REVOKED:
-                tableName = DatabaseDescription.PartyAchievementsToBeRevoked.TABLE_NAME;
+                tableName = StoryDBDescription.PartyAchievementsToBeRevoked.TABLE_NAME;
                 break;
             case LOCATIONS_TO_BE_UNLOCKED:
-                tableName = DatabaseDescription.LocationsToBeUnlocked.TABLE_NAME;
+                tableName = StoryDBDescription.LocationsToBeUnlocked.TABLE_NAME;
                 break;
             case LOCATIONS_TO_BE_BLOCKED:
-                tableName = DatabaseDescription.LocationsToBeBlocked.TABLE_NAME;
+                tableName = StoryDBDescription.LocationsToBeBlocked.TABLE_NAME;
                 break;
             case ADD_REWARD_APPLICATION_TYPES:
-                tableName = DatabaseDescription.AddRewardApplicationTypes.TABLE_NAME;
+                tableName = StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME;
                 break;
             case ADD_REWARD_TYPES:
-                tableName = DatabaseDescription.AddRewardTypes.TABLE_NAME;
+                tableName = StoryDBDescription.AddRewardTypes.TABLE_NAME;
                 break;
             case ADD_REWARDS:
-                tableName = DatabaseDescription.AddRewards.TABLE_NAME;
+                tableName = StoryDBDescription.AddRewards.TABLE_NAME;
                 break;
             case ADD_PENALTIES:
-                tableName = DatabaseDescription.AddPenalties.TABLE_NAME;
+                tableName = StoryDBDescription.AddPenalties.TABLE_NAME;
                 break;
             default:
                 throw new SQLException(getContext() != null ?  "Invalid Query Uri: " + uri : null);

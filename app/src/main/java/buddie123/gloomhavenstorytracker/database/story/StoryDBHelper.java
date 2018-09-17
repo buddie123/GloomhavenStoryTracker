@@ -9,13 +9,13 @@ public class StoryDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // constructor
-    public StoryDBHelper(Context context) {
+    StoryDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     // creates each table in the Story.db database when the database
     // is created
-    @Override
+    @Override // TODO in the deployment version, this method should build database from asset
     public void onCreate(SQLiteDatabase db) {
 
         // create the Locations Table
