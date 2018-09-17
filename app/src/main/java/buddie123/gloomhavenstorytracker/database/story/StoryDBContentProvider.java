@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -172,19 +173,35 @@ public class StoryDBContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
-        return null;
+        dbHelper = new StoryDBHelper(getContext());
+        return true;
+        // TODO verify that this return value is correct
     }
 
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
         return null;
+        // TODO Research how this method should be implemented
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        // initialize the queryBuilder object used to get the cursor with the query results
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        // set the appropriate table to query based on the given uri
+        queryBuilder.setTables(getTableName(uri));
+
+        // if querying a single element, get the match on the _ID
+        if(uriMatcher.match(uri) % 2 == 1) {
+            queryBuilder.appendWhere(BaseColumns._ID + "=" + uri.getLastPathSegment() );
+        }
+
+        // execute the query
+        return queryBuilder.query(dbHelper.getReadableDatabase(),
+                projection, selection, selectionArgs, null, null, sortOrder);
     }
 
     @Nullable
@@ -203,4 +220,55 @@ public class StoryDBContentProvider extends ContentProvider {
         return 0;
     }
 
+    // return a table name based on a given Uri, or throw an error if invalid
+    private String getTableName(Uri uri) {
+        String tableName;
+        switch (uriMatcher.match(uri) % 2 == 0 ? uriMatcher.match(uri) : uriMatcher.match(uri) + 1) {
+            case CHARACTER_CLASSES:
+                tableName = DatabaseDescription.CharacterClasses.TABLE_NAME;
+                break;
+            case LOCATIONS:
+                tableName = DatabaseDescription.Locations.TABLE_NAME;
+                break;
+            case GLOBAL_ACHIEVEMENTS:
+                tableName = DatabaseDescription.GlobalAchievements.TABLE_NAME;
+                break;
+            case PARTY_ACHIEVEMENTS:
+                tableName = DatabaseDescription.PartyAchievements.TABLE_NAME;
+                break;
+            case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
+                tableName = DatabaseDescription.GlobalAchievementsToBeAwarded.TABLE_NAME;
+                break;
+            case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
+                tableName = DatabaseDescription.GlobalAchievementsToBeRevoked.TABLE_NAME;
+                break;
+            case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
+                tableName = DatabaseDescription.PartyAchievementsToBeAwarded.TABLE_NAME;
+                break;
+            case PARTY_ACHIEVEMENTS_TO_BE_REVOKED:
+                tableName = DatabaseDescription.PartyAchievementsToBeRevoked.TABLE_NAME;
+                break;
+            case LOCATIONS_TO_BE_UNLOCKED:
+                tableName = DatabaseDescription.LocationsToBeUnlocked.TABLE_NAME;
+                break;
+            case LOCATIONS_TO_BE_BLOCKED:
+                tableName = DatabaseDescription.LocationsToBeBlocked.TABLE_NAME;
+                break;
+            case ADD_REWARD_APPLICATION_TYPES:
+                tableName = DatabaseDescription.AddRewardApplicationTypes.TABLE_NAME;
+                break;
+            case ADD_REWARD_TYPES:
+                tableName = DatabaseDescription.AddRewardTypes.TABLE_NAME;
+                break;
+            case ADD_REWARDS:
+                tableName = DatabaseDescription.AddRewards.TABLE_NAME;
+                break;
+            case ADD_PENALTIES:
+                tableName = DatabaseDescription.AddPenalties.TABLE_NAME;
+                break;
+            default:
+                throw new SQLException(getContext() != null ?  "Invalid Query Uri: " + uri : null);
+        }
+        return tableName;
+    }
 }
