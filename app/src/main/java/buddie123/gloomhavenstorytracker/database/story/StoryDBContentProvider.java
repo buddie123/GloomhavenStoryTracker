@@ -287,8 +287,22 @@ public class StoryDBContentProvider extends ContentProvider{
     }
 
     @Override // TODO this method should throw exception and not update the database
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        String id = uri.getLastPathSegment();
+
+        // delete the rows in the appropriate table, if able
+        int numberOfRowsUpdated = dbHelper.getWritableDatabase().update(
+                getTableName(uri), contentValues, BaseColumns._ID + "=" + id, selectionArgs);
+
+        // notify the contentResolver if a table has been changed
+        if (numberOfRowsUpdated != 0) {
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+        }
+
+        // return how many rows were deleted
+        return numberOfRowsUpdated;
     }
 
     // return a table name based on a given Uri, or throw an error if invalid
