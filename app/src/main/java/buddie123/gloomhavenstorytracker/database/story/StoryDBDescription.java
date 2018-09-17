@@ -55,27 +55,27 @@ public class StoryDBDescription {
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
         public static final String COLUMN_NAME = "name";
-        public static final String COLUMN_GROUP = "group";
+        public static final String COLUMN_GROUP_NAME = "group_name";
         public static final String COLUMN_MAX_COUNT = "max_count";
 
         public static Uri buildGlobalAchievementUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
 
-        // the GlobalAchievementsToBeAwarded table tracks which Global Achievements can be awarded
-        // by each Location that awards a global achievement when completed
-        public static final class GlobalAchievementsToBeAwarded implements BaseColumns {
-            public static final String TABLE_NAME = "global_achievements_to_be_awarded"; // table's name
+    // the GlobalAchievementsToBeAwarded table tracks which Global Achievements can be awarded
+    // by each Location that awards a global achievement when completed
+    public static final class GlobalAchievementsToBeAwarded implements BaseColumns {
+        public static final String TABLE_NAME = "global_achievements_to_be_awarded"; // table's name
 
-            public static final Uri CONTENT_URI =
-                    BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
-            public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
-            public static final String COLUMN_GLOBAL_ACHIEVEMENT_ID = "global_achievement_id";
+        public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
+        public static final String COLUMN_GLOBAL_ACHIEVEMENT_ID = "global_achievement_id";
 
-            public static Uri buildGlobalAchievementToBeAwardedUri(long id) {
-                return ContentUris.withAppendedId(CONTENT_URI, id);
-            }
+        public static Uri buildGlobalAchievementToBeAwardedUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 
