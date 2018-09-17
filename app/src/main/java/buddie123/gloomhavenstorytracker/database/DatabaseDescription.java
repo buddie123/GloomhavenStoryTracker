@@ -139,6 +139,20 @@ public class DatabaseDescription {
         }
     }
 
+    public static final class CharacterClassesUnlocked implements BaseColumns {
+        public static final String TABLE_NAME = "character_classes_unlocked";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+
+        public static final String COLUMN_PARTY = "party"; // primary key / foreign key
+        public static final String COLUMN_CLASS = "class"; // primary key / foreign key
+
+        public static Uri buildCharacterClassUnlocked(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
     // the Locations table records basic information about each location in the
     // game, including the teaser, summary, and conclusion texts.
     public static final class Locations implements BaseColumns {
@@ -174,6 +188,7 @@ public class DatabaseDescription {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
+
 
     // the GlobalAchievementsToBeAwarded table tracks which Global Achievements can be awarded
     // by each Location that awards a global achievement when completed
