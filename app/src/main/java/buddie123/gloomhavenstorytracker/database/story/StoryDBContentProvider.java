@@ -269,9 +269,11 @@ public class StoryDBContentProvider extends ContentProvider{
 
     @Override // TODO this method should throw exception and not delete anything from the database
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        String id = uri.getLastPathSegment();
+
         // delete the rows in the appropriate table, if able
         int numberOfRowsDeleted = dbHelper.getWritableDatabase().delete(
-                getTableName(uri), selection, selectionArgs);
+                getTableName(uri), BaseColumns._ID + "=" + id, selectionArgs);
 
         // notify the contentResolver if a table has been changed
         if (numberOfRowsDeleted != 0) {
