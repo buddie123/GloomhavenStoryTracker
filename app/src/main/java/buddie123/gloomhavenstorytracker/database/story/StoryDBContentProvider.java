@@ -206,6 +206,8 @@ public class StoryDBContentProvider extends ContentProvider{
     @Nullable
     @Override   // TODO this method should throw an exception and not perform the insert
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+        Uri newElementUri = null;
+
         // insert into database. ignore insert if the constraints aren't met
         long rowID = dbHelper.getWritableDatabase().insertWithOnConflict(
                 getTableName(uri), null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
@@ -214,41 +216,72 @@ public class StoryDBContentProvider extends ContentProvider{
         if(rowID > 0) {
             switch (uriMatcher.match(uri)) {
                 case LOCATIONS:
-                    return StoryDBDescription.Locations.buildLocationUri(rowID);
+                    newElementUri = StoryDBDescription.Locations.buildLocationUri(rowID);
+                    break;
                 case GLOBAL_ACHIEVEMENTS:
-                    return StoryDBDescription.GlobalAchievements.buildGlobalAchievementUri(rowID);
+                    newElementUri = StoryDBDescription.GlobalAchievements.buildGlobalAchievementUri(rowID);
+                    break;
                 case PARTY_ACHIEVEMENTS:
-                    return StoryDBDescription.PartyAchievements.buildPartyAchievementUri(rowID);
+                    newElementUri = StoryDBDescription.PartyAchievements.buildPartyAchievementUri(rowID);
+                    break;
                 case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
-                    return StoryDBDescription.GlobalAchievementsToBeAwarded.buildGlobalAchievementToBeAwardedUri(rowID);
+                    newElementUri = StoryDBDescription.GlobalAchievementsToBeAwarded.buildGlobalAchievementToBeAwardedUri(rowID);
+                    break;
                 case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
-                    return StoryDBDescription.GlobalAchievementsToBeRevoked.buildGlobalAchievementToBeRevokedUri(rowID);
+                    newElementUri = StoryDBDescription.GlobalAchievementsToBeRevoked.buildGlobalAchievementToBeRevokedUri(rowID);
+                    break;
                 case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
-                    return StoryDBDescription.PartyAchievementsToBeAwarded.buildPartyAchievementToBeAwardedUri(rowID);
+                    newElementUri = StoryDBDescription.PartyAchievementsToBeAwarded.buildPartyAchievementToBeAwardedUri(rowID);
+                    break;
                 case PARTY_ACHIEVEMENTS_TO_BE_REVOKED:
-                    return StoryDBDescription.PartyAchievementsToBeRevoked.buildPartyAchievementToBeRevokedUri(rowID);
+                    newElementUri = StoryDBDescription.PartyAchievementsToBeRevoked.buildPartyAchievementToBeRevokedUri(rowID);
+                    break;
                 case LOCATIONS_TO_BE_UNLOCKED:
-                    return StoryDBDescription.LocationsToBeUnlocked.buildLocationToBeUnlockedUri(rowID);
+                    newElementUri = StoryDBDescription.LocationsToBeUnlocked.buildLocationToBeUnlockedUri(rowID);
+                    break;
                 case LOCATIONS_TO_BE_BLOCKED:
-                    return StoryDBDescription.LocationsToBeBlocked.buildLocationToBeBlockedUri(rowID);
+                    newElementUri = StoryDBDescription.LocationsToBeBlocked.buildLocationToBeBlockedUri(rowID);
+                    break;
                 case ADD_REWARD_APPLICATION_TYPES:
-                    return StoryDBDescription.AddRewardApplicationTypes.buildAddRewardApplicationTypeUri(rowID);
+                    newElementUri = StoryDBDescription.AddRewardApplicationTypes.buildAddRewardApplicationTypeUri(rowID);
+                    break;
                 case ADD_REWARD_TYPES:
-                    return StoryDBDescription.AddRewardTypes.buildAddRewardTypeUri(rowID);
+                    newElementUri = StoryDBDescription.AddRewardTypes.buildAddRewardTypeUri(rowID);
+                    break;
                 case ADD_REWARDS:
-                    return StoryDBDescription.AddRewards.buildAddRewardUri(rowID);
+                    newElementUri = StoryDBDescription.AddRewards.buildAddRewardUri(rowID);
+                    break;
                 case ADD_PENALTIES:
-                    return StoryDBDescription.AddPenalties.buildAddPenaltyUri(rowID);
+                    newElementUri = StoryDBDescription.AddPenalties.buildAddPenaltyUri(rowID);
+                    break;
                 case CHARACTER_CLASSES:
-                    return StoryDBDescription.CharacterClasses.buildCharacterClassUri(rowID);
+                    newElementUri = StoryDBDescription.CharacterClasses.buildCharacterClassUri(rowID);
+                    break;
+            }
+
+            // update the content resolver that the specific table has been changed
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
             }
         }
-        return null;
+        return newElementUri;
     }
 
     @Override // TODO this method should throw exception and not delete anything from the database
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        // delete the rows in the appropriate table, if able
+        int numberOfRowsDeleted = dbHelper.getWritableDatabase().delete(
+                getTableName(uri), selection, selectionArgs);
+
+        // notify the contentResolver if a table has been changed
+        if (numberOfRowsDeleted != 0) {
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+        }
+
+        // return how many rows were deleted
+        return numberOfRowsDeleted;
     }
 
     @Override // TODO this method should throw exception and not update the database
