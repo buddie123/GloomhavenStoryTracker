@@ -40,8 +40,8 @@ public class UserDBDescription {
         public static final String COLUMN_PARTY_ID = "party_id";
         public static final String COLUMN_LOCATION_ID = "location_id";
         public static final String COLUMN_NUMBER = "number";
-        public static final String COLUMN_SUCCESSFUL = "successful";
-        public static final String COLUMN_DATE = "date";
+        public static final String COLUMN_SUCCESSFUL_ID = "successful";
+        public static final String COLUMN_DATE_ID = "date_id";
 
         public static Uri buildAttemptUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -126,16 +126,16 @@ public class UserDBDescription {
         }
     }
 
-    public static final class CharacterClassesUnlocked implements BaseColumns {
+    public static final class UnlockedCharacterClasses implements BaseColumns {
         public static final String TABLE_NAME = "character_classes_unlocked";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
-        public static final String COLUMN_PARTY_ID= "party_id"; // primary key / foreign key
-        public static final String COLUMN_CLASS_ID = "class_id"; // primary key / foreign key
+        public static final String COLUMN_PARTY_ID= "party_id";
+        public static final String COLUMN_CLASS_ID = "class_id";
 
-        public static Uri buildCharacterClassUnlocked(long id) {
+        public static Uri buildUnlockedCharacterClassUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
@@ -183,7 +183,7 @@ public class UserDBDescription {
 
         public static final String COLUMN_PARTY_ID = "party_id";
         public static final String COLUMN_COMPLETED_LOCATION_ID = "completed_location_id";
-        public static final String COLUMN_COMPLETED_DATE = "completed_date";
+        public static final String COLUMN_COMPLETED_DATE_ID = "completed_date_id";
 
         public static Uri buildCompletedLocationUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -234,6 +234,21 @@ public class UserDBDescription {
         public static final String COLUMN_PARTY_ACHIEVEMENT_ID = "party_achievement_id";
 
         public static Uri buildActivePartyAchievementUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class Dates implements BaseColumns {
+        public static final String TABLE_NAME = "dates";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+
+        public static final String COLUMN_YEAR = "year";
+        public static final String COLUMN_MONTH = "month";
+        public static final String COLUMN_DAY = "day";
+
+        public static Uri buildDateUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

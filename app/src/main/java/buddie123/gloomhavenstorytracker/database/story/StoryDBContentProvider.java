@@ -65,6 +65,9 @@ public class StoryDBContentProvider extends ContentProvider{
 
     private static final int ONE_ADD_PENALTY = 27;
     private static final int ADD_PENALTIES = 28;
+
+    private static final int ONE_YES_NO_RESPONSE = 29;
+    private static final int YES_NO_RESPONSES = 30;
     // IMPORTANT: For each table added to this database, the single row
     // access constant should be odd and one less than the table access
     // constant. The logic in the CRUD operations depend on this arraignment.
@@ -159,6 +162,12 @@ public class StoryDBContentProvider extends ContentProvider{
                 StoryDBDescription.CharacterClasses.TABLE_NAME + "/#", ONE_CHARACTER_CLASS);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
                 StoryDBDescription.CharacterClasses.TABLE_NAME, CHARACTER_CLASSES);
+
+        // Yes/No Responses
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.YesNoResponses.TABLE_NAME + "/#", ONE_YES_NO_RESPONSE);
+        uriMatcher.addURI(StoryDBDescription.AUTHORITY,
+                StoryDBDescription.YesNoResponses.TABLE_NAME, YES_NO_RESPONSES);
     }
 
     // simply initializes the StoryDBHelper
@@ -256,6 +265,8 @@ public class StoryDBContentProvider extends ContentProvider{
                 case CHARACTER_CLASSES:
                     newElementUri = StoryDBDescription.CharacterClasses.buildCharacterClassUri(rowID);
                     break;
+                case YES_NO_RESPONSES:
+                    newElementUri = StoryDBDescription.YesNoResponses.buildYesNoResponseUri(rowID);
             }
 
             // update the content resolver that the specific table has been changed
@@ -357,6 +368,9 @@ public class StoryDBContentProvider extends ContentProvider{
                 break;
             case ADD_PENALTIES:
                 tableName = StoryDBDescription.AddPenalties.TABLE_NAME;
+                break;
+            case YES_NO_RESPONSES:
+                tableName = StoryDBDescription.YesNoResponses.TABLE_NAME;
                 break;
             default:
                 throw new SQLException(getContext() != null ?  "Invalid Query Uri: " + uri : null);

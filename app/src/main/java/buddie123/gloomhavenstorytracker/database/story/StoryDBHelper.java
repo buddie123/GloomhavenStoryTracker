@@ -147,10 +147,17 @@ public class StoryDBHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ADD_PENALTIES_TABLE);
 
         // create the CharacterClasses table =
-        final String CREATE_CHARACTER_CLASSES =
+        final String CREATE_CHARACTER_CLASSES_TABLE =
                 "CREATE TABLE " + StoryDBDescription.CharacterClasses.TABLE_NAME + "(" +
                         StoryDBDescription.CharacterClasses.COLUMN_CLASS + " TEXT UNIQUE);";
-        db.execSQL(CREATE_CHARACTER_CLASSES);
+        db.execSQL(CREATE_CHARACTER_CLASSES_TABLE);
+
+        // create the YesNoResponses table
+        final String CREATE_YES_NO_RESPONSES_TABLE =
+                "CREATE TABLE " + StoryDBDescription.YesNoResponses.TABLE_NAME + "(" +
+                        StoryDBDescription.YesNoResponses.COLUMN_RESPONSE + "TEXT UNIQUE);";
+        db.execSQL(CREATE_YES_NO_RESPONSES_TABLE);
+
     }
 
     // defines how to upgrade the database when the schema changes

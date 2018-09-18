@@ -209,6 +209,21 @@ public class StoryDBDescription {
         }
     }
 
+   // a table to hold the values yes and no....
+    public static final class YesNoResponses implements BaseColumns {
+        public static final String TABLE_NAME = "yes_no_responses";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+
+        // column names
+        public static final String COLUMN_RESPONSE = "response";
+
+        public static Uri buildYesNoResponseUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
     // the AddRewards table list the additional rewards that can be gained by
     // a party when a given location is completed
     public static final class AddRewards implements BaseColumns {
