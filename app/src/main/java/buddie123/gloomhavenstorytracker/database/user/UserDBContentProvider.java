@@ -4,7 +4,10 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -64,7 +67,6 @@ public class UserDBContentProvider extends ContentProvider {
     // IMPORTANT: For each table added to this database, the single row
     // access constant should be odd and one less than the table access
     // constant. The logic in the CRUD operations depends on this arraignment.
-
 
 
     // static block to configure this ContentProvider's UriMatcher
@@ -153,8 +155,28 @@ public class UserDBContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
-        return null;
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        // initialize the queryBuilder object used to get the cursor with the query results
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        // set the appropriate table to query based on the given uri
+        queryBuilder.setTables(getTableName(uri));
+
+        // if querying a single element, get the match on the _ID
+        if (uriMatcher.match(uri) % 2 == 1) {
+            queryBuilder.appendWhere(BaseColumns._ID + "=" + uri.getLastPathSegment());
+        }
+
+        // execute the query
+        Cursor cursor = queryBuilder.query(dbHelper.getReadableDatabase(),
+                projection, selection, selectionArgs, null, null, sortOrder);
+
+        // set observer so that changes to the database will reflect in the cursor
+        if(getContext() != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
+
+        return cursor;
     }
 
     @Nullable
@@ -178,5 +200,60 @@ public class UserDBContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return 0;
+    }
+
+    // return a table name based on a given Uri, or throw an error if invalid
+    // note: the switch logic expects that whole table lookups will be even and that
+    // single row lookups will odd and use a constant one number less than the whole
+    // table lookup constant
+    private String getTableName(Uri uri) {
+        String tableName;
+        switch (uriMatcher.match(uri) % 2 == 0 ? uriMatcher.match(uri) : uriMatcher.match(uri) + 1) {
+            case PARTIES:
+                tableName = UserDBDescription.Parties.TABLE_NAME;
+                break;
+            case CHARACTERS:
+                tableName = UserDBDescription.Characters.TABLE_NAME;
+                break;
+            case ATTEMPTS:
+                tableName = UserDBDescription.Attempts.TABLE_NAME;
+                break;
+            case ATTEMPT_PARTICIPANTS:
+                tableName = UserDBDescription.AttemptParticipants.TABLE_NAME;
+                break;
+            case ATTEMPT_NON_PARTICIPANTS:
+                tableName = UserDBDescription.AttemptNonParticipants.TABLE_NAME;
+                break;
+            case UNLOCKED_LOCATIONS:
+                tableName = UserDBDescription.UnlockedLocations.TABLE_NAME;
+                break;
+            case BLOCKED_LOCATIONS:
+                tableName = UserDBDescription.BlockedLocations.TABLE_NAME;
+                break;
+            case COMPLETED_LOCCATIONS:
+                tableName = UserDBDescription.CompletedLocations.TABLE_NAME;
+                break;
+            case LOCKED_LOCATIONS:
+                tableName = UserDBDescription.LockedLocations.TABLE_NAME;
+                break;
+            case ATTEMPT_NOTES:
+                tableName = UserDBDescription.AttemptNotes.TABLE_NAME;
+                break;
+            case UNLOCKED_CHARACTER_CLASSES:
+                tableName = UserDBDescription.UnlockedCharacterClasses.TABLE_NAME;
+                break;
+            case ACTIVE_GLOBAL_ACHIEVEMENTS:
+                tableName = UserDBDescription.ActiveGlobalAchievements.TABLE_NAME;
+                break;
+            case ACTIVE_PARTY_ACHIEVEMENTS:
+                tableName = UserDBDescription.ActivePartyAchievements.TABLE_NAME;
+                break;
+            case DATES:
+                tableName = UserDBDescription.Dates.TABLE_NAME;
+                break;
+            default:
+                throw new SQLException(getContext() != null ?  "Invalid Query Uri: " + uri : null);
+        }
+        return tableName;
     }
 }

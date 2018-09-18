@@ -20,12 +20,19 @@
             </intent-filter>
         </activity>
 
+        <!--TODO remove the WRITE permission for the database -->
         <provider
             android:name=".database.story.StoryDBContentProvider"
             android:authorities="buddie123.gloomhavenstorytracker.database.story"
             android:grantUriPermissions="true"
             android:readPermission=".database.story.READ"
             android:writePermission=".database.story.WRITE" />
+        <provider
+            android:authorities="buddie123.gloomhavenstorytracker.database.user"
+            android:name=".database.user.UserDBContentProvider"
+            android:grantUriPermissions="true"
+            android:readPermission=".database.user.READ"
+            android:writePermission=".database.user.WRITE"/>
 
     </application>
 
