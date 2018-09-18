@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -45,7 +46,7 @@ public class UserDBContentProvider extends ContentProvider {
     public static final int BLOCKED_LOCATIONS = 14;
 
     public static final int ONE_COMPLETED_LOCATION = 15;
-    public static final int COMPLETED_LOCCATIONS = 16;
+    public static final int COMPLETED_LOCATIONS = 16;
 
     public static final int ONE_LOCKED_LOCATION = 17;
     public static final int LOCKED_LOCATIONS = 18;
@@ -59,7 +60,7 @@ public class UserDBContentProvider extends ContentProvider {
     public static final int ONE_ACTIVE_GLOBAL_ACHIEVEMENT = 23;
     public static final int ACTIVE_GLOBAL_ACHIEVEMENTS = 24;
 
-    public static final int ONE_ACTIVE_PARTY_ACHIEVMENT = 25;
+    public static final int ONE_ACTIVE_PARTY_ACHIEVEMENT = 25;
     public static final int ACTIVE_PARTY_ACHIEVEMENTS = 26;
 
     public static final int ONE_DATE = 27;
@@ -112,7 +113,7 @@ public class UserDBContentProvider extends ContentProvider {
         uriMatcher.addURI(UserDBDescription.AUTHORITY,
                 UserDBDescription.CompletedLocations.TABLE_NAME + "/#", ONE_COMPLETED_LOCATION);
         uriMatcher.addURI(UserDBDescription.AUTHORITY,
-                UserDBDescription.CompletedLocations.TABLE_NAME, COMPLETED_LOCCATIONS);
+                UserDBDescription.CompletedLocations.TABLE_NAME, COMPLETED_LOCATIONS);
 
         uriMatcher.addURI(UserDBDescription.AUTHORITY,
                 UserDBDescription.LockedLocations.TABLE_NAME + "/#", LOCKED_LOCATIONS);
@@ -135,7 +136,7 @@ public class UserDBContentProvider extends ContentProvider {
                 UserDBDescription.ActiveGlobalAchievements.TABLE_NAME, ACTIVE_GLOBAL_ACHIEVEMENTS);
 
         uriMatcher.addURI(UserDBDescription.AUTHORITY,
-                UserDBDescription.ActivePartyAchievements.TABLE_NAME + "/#", ONE_ACTIVE_PARTY_ACHIEVMENT);
+                UserDBDescription.ActivePartyAchievements.TABLE_NAME + "/#", ONE_ACTIVE_PARTY_ACHIEVEMENT);
         uriMatcher.addURI(UserDBDescription.AUTHORITY,
                 UserDBDescription.ActivePartyAchievements.TABLE_NAME, ACTIVE_PARTY_ACHIEVEMENTS);
 
@@ -189,17 +190,103 @@ public class UserDBContentProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+        Uri newElementUri = null;
+
+        // insert into database. ignore insert if the constraints aren't met
+        long rowID = dbHelper.getWritableDatabase().insertWithOnConflict(
+                getTableName(uri), null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
+
+        // get the uri for inserted element
+        if(rowID > 0) {
+            switch (uriMatcher.match(uri)) {
+                case PARTIES:
+                    newElementUri = UserDBDescription.Parties.buildPartyUri(rowID);
+                    break;
+                case CHARACTERS:
+                    newElementUri = UserDBDescription.Characters.buildCharacterUri(rowID);
+                    break;
+                case ATTEMPTS:
+                    newElementUri = UserDBDescription.Attempts.buildAttemptUri(rowID);
+                    break;
+                case ATTEMPT_PARTICIPANTS:
+                    newElementUri = UserDBDescription.AttemptParticipants.buildAttemptParticipantUri(rowID);
+                    break;
+                case ATTEMPT_NON_PARTICIPANTS:
+                    newElementUri = UserDBDescription.AttemptNonParticipants.buildAttemptNonParticipantUri(rowID);
+                    break;
+                case UNLOCKED_LOCATIONS:
+                    newElementUri = UserDBDescription.UnlockedLocations.buildUnlockedLocationUri(rowID);
+                    break;
+                case BLOCKED_LOCATIONS:
+                    newElementUri = UserDBDescription.BlockedLocations.buildBlockedLocationUri(rowID);
+                    break;
+                case COMPLETED_LOCATIONS:
+                    newElementUri = UserDBDescription.CompletedLocations.buildCompletedLocationUri(rowID);
+                    break;
+                case LOCKED_LOCATIONS:
+                    newElementUri = UserDBDescription.LockedLocations.buildLockedLocationUri(rowID);
+                    break;
+                case ATTEMPT_NOTES:
+                    newElementUri = UserDBDescription.AttemptNotes.buildAttemptNoteUri(rowID);
+                    break;
+                case UNLOCKED_CHARACTER_CLASSES:
+                    newElementUri = UserDBDescription.UnlockedCharacterClasses.buildUnlockedCharacterClassUri(rowID);
+                    break;
+                case ACTIVE_GLOBAL_ACHIEVEMENTS:
+                    newElementUri = UserDBDescription.ActiveGlobalAchievements.buildActiveGlobalAchievementUri(rowID);
+                    break;
+                case ACTIVE_PARTY_ACHIEVEMENTS:
+                    newElementUri = UserDBDescription.ActivePartyAchievements.buildActivePartyAchievementUri(rowID);
+                    break;
+                case DATES:
+                    newElementUri = UserDBDescription.Dates.buildDateUri(rowID);
+                    break;
+            }
+            // update the content resolver that the specific table has been changed
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+        }
+        return newElementUri;
     }
 
+    // delete the row in the given table with the given ID
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        // get the _ID field of the row to delete
+        String id = uri.getLastPathSegment();
+
+        // delete the rows in the appropriate table, if able
+        int numberOfRowsDeleted = dbHelper.getWritableDatabase().delete(
+                getTableName(uri), BaseColumns._ID + "=" + id, selectionArgs);
+
+        // notify the contentResolver if a table has been changed
+        if (numberOfRowsDeleted != 0) {
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+        }
+
+        // return how many rows were deleted
+        return numberOfRowsDeleted;
     }
 
-    @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
+        String id = uri.getLastPathSegment();
+
+        // update the rows in the appropriate table, if able
+        int numberOfRowsUpdated = dbHelper.getWritableDatabase().update(
+                getTableName(uri), contentValues, BaseColumns._ID + "=" + id, selectionArgs);
+
+        // notify the contentResolver if a table has been changed
+        if (numberOfRowsUpdated != 0) {
+            if(getContext() != null) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
+        }
+
+        // return how many rows were updated
+        return numberOfRowsUpdated;
     }
 
     // return a table name based on a given Uri, or throw an error if invalid
@@ -230,7 +317,7 @@ public class UserDBContentProvider extends ContentProvider {
             case BLOCKED_LOCATIONS:
                 tableName = UserDBDescription.BlockedLocations.TABLE_NAME;
                 break;
-            case COMPLETED_LOCCATIONS:
+            case COMPLETED_LOCATIONS:
                 tableName = UserDBDescription.CompletedLocations.TABLE_NAME;
                 break;
             case LOCKED_LOCATIONS:
