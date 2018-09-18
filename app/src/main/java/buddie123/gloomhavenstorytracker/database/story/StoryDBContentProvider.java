@@ -175,7 +175,7 @@ public class StoryDBContentProvider extends ContentProvider{
     public boolean onCreate() {
         dbHelper = new StoryDBHelper(getContext());
         return true;
-        // TODO verify that this return value is correct
+        // TODO verify that this return value computation is correct
     }
 
     // not sure what this method is suppose to do
