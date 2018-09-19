@@ -14,8 +14,9 @@ import android.support.annotation.Nullable;
 
 public class StoryDBContentProvider extends ContentProvider{
     // used to access the database
-    private StoryDBHelper dbHelper;
+    public StoryDBHelper dbHelper;
 
+    private SQLiteDatabase db;
     // UriMatcher helps content provider determine operation to perform
     private static final UriMatcher uriMatcher =
             new UriMatcher(UriMatcher.NO_MATCH);
@@ -36,8 +37,8 @@ public class StoryDBContentProvider extends ContentProvider{
     private static final int ONE_GLOBAL_ACHIEVEMENT_TO_BE_AWARDED = 7;
     private static final int GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED = 8;
 
-    private static final int ONE_GLOBAL_ACHIEVEMENT_TO_BE_REVOKED = 9;
-    private static final int GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED = 10;
+    private static final int ONE_ACHIEVEMENT_TYPE = 9;
+    private static final int ACHIEVEMENT_TYPES = 10;
 
     private static final int ONE_PARTY_ACHIEVEMENT = 11;
     private static final int PARTY_ACHIEVEMENTS = 12;
@@ -54,20 +55,21 @@ public class StoryDBContentProvider extends ContentProvider{
     private static final int ONE_LOCATIONS_TO_BE_BLOCKED = 19;
     private static final int LOCATIONS_TO_BE_BLOCKED = 20;
 
-    private static final int ONE_ADD_REWARD_APPLICATION_TYPE = 21;
-    private static final int ADD_REWARD_APPLICATION_TYPES = 22;
+    private static final int ONE_APPLICATION_TYPE = 21;
+    private static final int APPLICATION_TYPES = 22;
 
-    private static final int ONE_ADD_REWARD_TYPE = 23;
-    private static final int ADD_REWARD_TYPES = 24;
+    private static final int ONE_ADDITIONAL_REWARD_TYPE = 23;
+    private static final int ADDITIONAL_REWARD_TYPES = 24;
 
-    private static final int ONE_ADD_REWARD = 25;
-    private static final int ADD_REWARDS = 26;
+    private static final int ONE_ADDITIONAL_REWARD = 25;
+    private static final int ADDITIONAL_REWARDS = 26;
 
-    private static final int ONE_ADD_PENALTY = 27;
-    private static final int ADD_PENALTIES = 28;
+    private static final int ONE_ADDITIONAL_PENALTY = 27;
+    private static final int ADDITIONAL_PENALTIES = 28;
 
     private static final int ONE_YES_NO_RESPONSE = 29;
     private static final int YES_NO_RESPONSES = 30;
+
     // IMPORTANT: For each table added to this database, the single row
     // access constant should be odd and one less than the table access
     // constant. The logic in the CRUD operations depend on this arraignment.
@@ -105,9 +107,9 @@ public class StoryDBContentProvider extends ContentProvider{
 
         // Global Achievements to be revoked
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME + "/#", ONE_GLOBAL_ACHIEVEMENT_TO_BE_REVOKED);
+                StoryDBDescription.AchievementTypes.TABLE_NAME + "/#", ONE_ACHIEVEMENT_TYPE);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME, GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED);
+                StoryDBDescription.AchievementTypes.TABLE_NAME, ACHIEVEMENT_TYPES);
 
         // Party Achievements to be awarded
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
@@ -135,27 +137,27 @@ public class StoryDBContentProvider extends ContentProvider{
 
         // Add Reward Application Types
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_APPLICATION_TYPE);
+                StoryDBDescription.ApplicationTypes.TABLE_NAME + "/#", ONE_APPLICATION_TYPE);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME, ADD_REWARD_APPLICATION_TYPES);
+                StoryDBDescription.ApplicationTypes.TABLE_NAME, APPLICATION_TYPES);
 
         // Add Reward Types
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewardTypes.TABLE_NAME + "/#", ONE_ADD_REWARD_TYPE);
+                StoryDBDescription.AdditionalRewardTypes.TABLE_NAME + "/#", ONE_ADDITIONAL_REWARD_TYPE);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewardTypes.TABLE_NAME, ADD_REWARD_TYPES);
+                StoryDBDescription.AdditionalRewardTypes.TABLE_NAME, ADDITIONAL_REWARD_TYPES);
 
         // Add Rewards
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewards.TABLE_NAME + "/#", ONE_ADD_REWARD);
+                StoryDBDescription.AdditionalRewards.TABLE_NAME + "/#", ONE_ADDITIONAL_REWARD);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddRewards.TABLE_NAME, ADD_REWARDS);
+                StoryDBDescription.AdditionalRewards.TABLE_NAME, ADDITIONAL_REWARDS);
 
         // Add Penalties
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddPenalties.TABLE_NAME + "/#", ONE_ADD_PENALTY);
+                StoryDBDescription.AdditionalPenalties.TABLE_NAME + "/#", ONE_ADDITIONAL_PENALTY);
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
-                StoryDBDescription.AddPenalties.TABLE_NAME, ADD_PENALTIES);
+                StoryDBDescription.AdditionalPenalties.TABLE_NAME, ADDITIONAL_PENALTIES);
 
         // Character Classes
         uriMatcher.addURI(StoryDBDescription.AUTHORITY,
@@ -174,6 +176,9 @@ public class StoryDBContentProvider extends ContentProvider{
     @Override
     public boolean onCreate() {
         dbHelper = new StoryDBHelper(getContext());
+        db = dbHelper.getReadableDatabase();
+        dbHelper.onCreate(db);
+        db = dbHelper.getReadableDatabase();
         return true;
         // TODO verify that this return value computation is correct
     }
@@ -205,119 +210,30 @@ public class StoryDBContentProvider extends ContentProvider{
         }
 
         // execute the query
-        return queryBuilder.query(dbHelper.getReadableDatabase(),
+        return queryBuilder.query(db,
                 projection, selection, selectionArgs, null, null, sortOrder);
     }
 
     // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
-    // insert the given elements into the given table ( should not give a row id, except for location)
     @Nullable
-    @Override   // TODO this method should throw an exception and not perform the insert
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        Uri newElementUri = null;
-
-        // insert into database. ignore insert if the constraints aren't met
-        long rowID = dbHelper.getWritableDatabase().insertWithOnConflict(
-                getTableName(uri), null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
-
-        // get the uri for inserted element
-        if(rowID > 0) {
-            switch (uriMatcher.match(uri)) {
-                case LOCATIONS:
-                    newElementUri = StoryDBDescription.Locations.buildLocationUri(rowID);
-                    break;
-                case GLOBAL_ACHIEVEMENTS:
-                    newElementUri = StoryDBDescription.GlobalAchievements.buildGlobalAchievementUri(rowID);
-                    break;
-                case PARTY_ACHIEVEMENTS:
-                    newElementUri = StoryDBDescription.PartyAchievements.buildPartyAchievementUri(rowID);
-                    break;
-                case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
-                    newElementUri = StoryDBDescription.GlobalAchievementsToBeAwarded.buildGlobalAchievementToBeAwardedUri(rowID);
-                    break;
-                case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
-                    newElementUri = StoryDBDescription.GlobalAchievementsToBeRevoked.buildGlobalAchievementToBeRevokedUri(rowID);
-                    break;
-                case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
-                    newElementUri = StoryDBDescription.PartyAchievementsToBeAwarded.buildPartyAchievementToBeAwardedUri(rowID);
-                    break;
-                case PARTY_ACHIEVEMENTS_TO_BE_REVOKED:
-                    newElementUri = StoryDBDescription.PartyAchievementsToBeRevoked.buildPartyAchievementToBeRevokedUri(rowID);
-                    break;
-                case LOCATIONS_TO_BE_UNLOCKED:
-                    newElementUri = StoryDBDescription.LocationsToBeUnlocked.buildLocationToBeUnlockedUri(rowID);
-                    break;
-                case LOCATIONS_TO_BE_BLOCKED:
-                    newElementUri = StoryDBDescription.LocationsToBeBlocked.buildLocationToBeBlockedUri(rowID);
-                    break;
-                case ADD_REWARD_APPLICATION_TYPES:
-                    newElementUri = StoryDBDescription.AddRewardApplicationTypes.buildAddRewardApplicationTypeUri(rowID);
-                    break;
-                case ADD_REWARD_TYPES:
-                    newElementUri = StoryDBDescription.AddRewardTypes.buildAddRewardTypeUri(rowID);
-                    break;
-                case ADD_REWARDS:
-                    newElementUri = StoryDBDescription.AddRewards.buildAddRewardUri(rowID);
-                    break;
-                case ADD_PENALTIES:
-                    newElementUri = StoryDBDescription.AddPenalties.buildAddPenaltyUri(rowID);
-                    break;
-                case CHARACTER_CLASSES:
-                    newElementUri = StoryDBDescription.CharacterClasses.buildCharacterClassUri(rowID);
-                    break;
-                case YES_NO_RESPONSES:
-                    newElementUri = StoryDBDescription.YesNoResponses.buildYesNoResponseUri(rowID);
-            }
-
-            // update the content resolver that the specific table has been changed
-            if(getContext() != null) {
-                getContext().getContentResolver().notifyChange(uri, null);
-            }
-        }
-        return newElementUri;
+    @Override
+    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues)
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Cannot perform insert: Story.db is read-only!)");
     }
 
-    // delete the row in the given table with the given ID
     // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
-    @Override // TODO this method should throw exception and not delete anything from the database
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        // get the _ID field of the row to delete
-        String id = uri.getLastPathSegment();
-
-        // delete the rows in the appropriate table, if able
-        int numberOfRowsDeleted = dbHelper.getWritableDatabase().delete(
-                getTableName(uri), BaseColumns._ID + "=" + id, selectionArgs);
-
-        // notify the contentResolver if a table has been changed
-        if (numberOfRowsDeleted != 0) {
-            if(getContext() != null) {
-                getContext().getContentResolver().notifyChange(uri, null);
-            }
-        }
-
-        // return how many rows were deleted
-        return numberOfRowsDeleted;
+    @Override
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs)
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Cannot perform delete: Story.db is read-only!");
     }
 
-    // update the row in the given table with the given ID
     // WARNING: SHOULD NEVER BE CALLED BY THE PROGRAM
-    @Override // TODO this method should throw exception and not update the database
-    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs) {
-        String id = uri.getLastPathSegment();
-
-        // update the rows in the appropriate table, if able
-        int numberOfRowsUpdated = dbHelper.getWritableDatabase().update(
-                getTableName(uri), contentValues, BaseColumns._ID + "=" + id, selectionArgs);
-
-        // notify the contentResolver if a table has been changed
-        if (numberOfRowsUpdated != 0) {
-            if(getContext() != null) {
-                getContext().getContentResolver().notifyChange(uri, null);
-            }
-        }
-
-        // return how many rows were updated
-        return numberOfRowsUpdated;
+    @Override
+    public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String selection, @Nullable String[] selectionArgs)
+            throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Cannot perform update: Story.db is read-only!");
     }
 
     // return a table name based on a given Uri, or throw an error if invalid
@@ -342,8 +258,8 @@ public class StoryDBContentProvider extends ContentProvider{
             case GLOBAL_ACHIEVEMENTS_TO_BE_AWARDED:
                 tableName = StoryDBDescription.GlobalAchievementsToBeAwarded.TABLE_NAME;
                 break;
-            case GLOBAL_ACHIEVEMENTS_TO_BE_REVOKED:
-                tableName = StoryDBDescription.GlobalAchievementsToBeRevoked.TABLE_NAME;
+            case ACHIEVEMENT_TYPES:
+                tableName = StoryDBDescription.AchievementTypes.TABLE_NAME;
                 break;
             case PARTY_ACHIEVEMENTS_TO_BE_AWARDED:
                 tableName = StoryDBDescription.PartyAchievementsToBeAwarded.TABLE_NAME;
@@ -357,17 +273,17 @@ public class StoryDBContentProvider extends ContentProvider{
             case LOCATIONS_TO_BE_BLOCKED:
                 tableName = StoryDBDescription.LocationsToBeBlocked.TABLE_NAME;
                 break;
-            case ADD_REWARD_APPLICATION_TYPES:
-                tableName = StoryDBDescription.AddRewardApplicationTypes.TABLE_NAME;
+            case APPLICATION_TYPES:
+                tableName = StoryDBDescription.ApplicationTypes.TABLE_NAME;
                 break;
-            case ADD_REWARD_TYPES:
-                tableName = StoryDBDescription.AddRewardTypes.TABLE_NAME;
+            case ADDITIONAL_REWARD_TYPES:
+                tableName = StoryDBDescription.AdditionalRewardTypes.TABLE_NAME;
                 break;
-            case ADD_REWARDS:
-                tableName = StoryDBDescription.AddRewards.TABLE_NAME;
+            case ADDITIONAL_REWARDS:
+                tableName = StoryDBDescription.AdditionalRewards.TABLE_NAME;
                 break;
-            case ADD_PENALTIES:
-                tableName = StoryDBDescription.AddPenalties.TABLE_NAME;
+            case ADDITIONAL_PENALTIES:
+                tableName = StoryDBDescription.AdditionalPenalties.TABLE_NAME;
                 break;
             case YES_NO_RESPONSES:
                 tableName = StoryDBDescription.YesNoResponses.TABLE_NAME;

@@ -10,8 +10,22 @@ public class StoryDBDescription {
             "buddie123.gloomhavenstorytracker.database.story";
 
     // base URI used to interact with the ContentProvider
-    private static final Uri BASE_CONTENT_URI =
+    public static final Uri BASE_CONTENT_URI =
             Uri.parse("content://" + AUTHORITY);
+
+    //AchievementTypes
+    public static final class AchievementTypes implements BaseColumns {
+        public static final String TABLE_NAME = "achievement_types";
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
+
+        public static final String COLUMN_TYPE = "type";
+
+        public static Uri buildAchievementTypeUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
 
     // the character class keeps track of each of the 17 playable character
     // classes available in the game
@@ -21,7 +35,7 @@ public class StoryDBDescription {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
-        public static final String COLUMN_CLASS = "class";
+        public static final String COLUMN_NAME = "name";
 
         public static Uri buildCharacterClassUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -74,28 +88,13 @@ public class StoryDBDescription {
 
         public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
         public static final String COLUMN_GLOBAL_ACHIEVEMENT_ID = "global_achievement_id";
+        public static final String COLUMN_CONDITION = "condition";
 
         public static Uri buildGlobalAchievementToBeAwardedUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 
-
-    // the GlobalAchievementsToBeRevoked table tracks which Global Achievements will be
-    // lost by each Location that revokes/replaces a global achievement when completed
-    public static final class GlobalAchievementsToBeRevoked implements BaseColumns {
-        public static final String TABLE_NAME = "global_achievements_to_be_revoked"; // table's name
-
-        public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
-
-        public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
-        public static final String COLUMN_GLOBAL_ACHIEVEMENT_ID = "global_achievement_id";
-
-        public static Uri buildGlobalAchievementToBeRevokedUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
-        }
-    }
 
     // the PartyAchievements table records all and entry for each Party Achievement in the game
     public static final class PartyAchievements implements BaseColumns {
@@ -155,7 +154,8 @@ public class StoryDBDescription {
 
         // column names for contacts table's columns
         public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
-        public static final String COLUMN_UNLOCKED_LOCATION_ID= "unlocked_location_id";
+        public static final String COLUMN_LOCATION_TO_BE_UNLOCKED_ID= "location_to_be_unlocked_id";
+        public static final String COLUMN_CONDITION_ID = "condition_id";
 
         public static Uri buildLocationToBeUnlockedUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -170,8 +170,9 @@ public class StoryDBDescription {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
-        public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
-        public static final String COLUMN_BLOCKED_LOCATION_ID = "blocked_location_id";
+        public static final String COLUMN_LOCATION_TO_BE_BLOCKED_ID = "location_to_be_blocked_id";
+        public static final String COLUMN_INCOMPLETE_ACHIEVEMENT_ID = "incomplete_achievement_id";
+        public static final String COLUMN_INCOMPLETE_ACHIEVEMENT_TYPE_ID = "incomplete_achievement_type_id";
 
         public static Uri buildLocationToBeBlockedUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -180,23 +181,23 @@ public class StoryDBDescription {
 
     // table AddRewardApplicationTypes lists the how rewards can be applied:
     // either individually("each") or collectively
-    public static final class AddRewardApplicationTypes implements BaseColumns {
-        public static final String TABLE_NAME = "add_reward_application_types";
+    public static final class ApplicationTypes implements BaseColumns {
+        public static final String TABLE_NAME = "application_types";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
         public static final String COLUMN_APPLICATION_TYPE = "application_type";
 
-        public static Uri buildAddRewardApplicationTypeUri(long id) {
+        public static Uri buildApplicationTypeUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
 
     // table AddRewardTypes lists the types of additional rewards that can be
     // gained/lost by a party
-    public static final class AddRewardTypes implements BaseColumns {
-        public static final String TABLE_NAME = "add_reward_types";
+    public static final class AdditionalRewardTypes implements BaseColumns {
+        public static final String TABLE_NAME = "additional_reward_types";
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
@@ -226,8 +227,8 @@ public class StoryDBDescription {
 
     // the AddRewards table list the additional rewards that can be gained by
     // a party when a given location is completed
-    public static final class AddRewards implements BaseColumns {
-        public static final String TABLE_NAME = "add_rewards"; // table's name
+    public static final class AdditionalRewards implements BaseColumns {
+        public static final String TABLE_NAME = "additional_rewards"; // table's name
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
@@ -235,7 +236,7 @@ public class StoryDBDescription {
         public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
         public static final String COLUMN_REWARD_TYPE_ID = "reward_type_id";
         public static final String COLUMN_REWARD_VALUE = "reward_value";
-        public static final String COLUMN_REWARD_APPLICATION_TYPE_ID = "reward_application_type";
+        public static final String COLUMN_REWARD_APPLICATION_TYPE_ID = "reward_application_type_id";
 
         public static Uri buildAddRewardUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -244,18 +245,18 @@ public class StoryDBDescription {
 
     // the AddPenalties table list the additional rewards that will be lost by
     // a party when a given location is completed
-    public static final class AddPenalties implements BaseColumns {
-        public static final String TABLE_NAME = "add_penalties"; // table's name
+    public static final class AdditionalPenalties implements BaseColumns {
+        public static final String TABLE_NAME = "additional_penalties"; // table's name
 
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
-        public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed";
+        public static final String COLUMN_LOCATION_TO_BE_COMPLETED_ID = "location_to_be_completed_id";
         public static final String COLUMN_PENALTY_TYPE_ID = "penalty_type_id";
         public static final String COLUMN_PENALTY_VALUE = "penalty_value";
         public static final String COLUMN_PENALTY_APPLICATION_TYPE_ID = "penalty_application_type_id";
 
-        public static Uri buildAddPenaltyUri(long id) {
+        public static Uri buildAdditionalPenaltyUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
